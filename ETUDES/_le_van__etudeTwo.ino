@@ -1,4 +1,17 @@
-/**********************ETUDE 2 CART 360 2017*******************************
+/*Van Le
+ * 
+ * resistors:
+ * when a note pin is pressed a current is sent through the circuit at full voltage with little to no resistance. 
+ * the arduino reads this value and resends the same current to the Buzzer pin that outputs a corresponding sound.
+ * according to ohm's law, the current and voltage is inversely related to resistance 
+ * therefor when a resistance is added the voltage and current decreases, lowering the value read by arduino
+ * the lower value is then sent to the buzzer pin and is translated into a lower sound
+ * In the case of a resistance ladder with multiple buttons and resistors, as you press a button that is higher
+ * on the ladder (furthest from the output), the resistance from all the lower ladders is added hence resulting in
+ * a lower current than all the buttons lower on the ladder. these values read by the arduino are then sent  as a 
+ * corresponding current to the buzzer pin and translates it into distinct note/sounds.
+ * 
+ *//**********************ETUDE 2 CART 360 2017*******************************
  * WELCOME!
  * THE PURPOSE OF THIS EXERCISE IS TO DESIGN A VERY SIMPLE KEYBOARD (5 KEYS)
  * WHICH ALLOWS YOU TO PLAY LIVE, RECORD, AND PLAYBACK.
@@ -206,7 +219,14 @@ void selectMode()
  **************************************************************************/
 void reset()
 {
-  countNotes = 0; // resets countNotes to zero and clears array
+  // resets countNotes to zero and clears array
+  if(countNotes > 0){
+    for (int i=0; i < 16; i++){
+      notes[i]=0;
+      delay(duration);
+    }
+    countNotes=0;
+  } 
 
 }
 /******************LIVE(): IMPLEMENT **************************************
@@ -267,14 +287,21 @@ void record()
  **************************************************************************/
 void play()
 {
-  //replay recorded notes calling array values in 
-  //each position increasing at increments of 1
-  //send values at each position to buzzer
-  for (int i=0; i < 16; i++){
-    tone(BUZZER_PIN,notes[i], duration);
-    delay(duration);
+    //replay recorded notes calling array values in... 
+    //...each position increasing at increments of 1
+    //send values at each position to buzzer...
+      for (int i=0; i < 16; i++){
+      //...only when mode pin is not pressed allowing for easier switching between modes
+      if ((digitalRead(BUTTON_MODE_PIN) != HIGH)) 
+      {
+      //repeat if statement for switching modes to allow for easy switching at anytime...
+      //...during floop
+      tone(BUZZER_PIN,notes[i], duration);
+      delay(duration);
+      }
 
-  } 
+    } 
+
 }
 /******************LOOPMODE(): IMPLEMENT *********************************
  * INSTRUCTIONS:
@@ -288,20 +315,29 @@ void play()
  **************************************************************************/
 void loopMode()
 {
-  //replay recorded notes calling array values at every third increment (3,6,9,12,15)
-  for (int i=0; i < 16; i=i+3){
-    tone(BUZZER_PIN,notes[i], duration);
-    //delay for 400 miliseconds at increment 9
-    if (i==9){
-    delay(duration*2);
-    } else{
-    delay(duration);
-    }
-  } 
+
+    //replay recorded notes calling array values in increments of 3...
+    for (int i=0; i < 16; i=i+3){
+      //...only when mode pin is not pressed allowing for easier switching between modes
+      if ((digitalRead(BUTTON_MODE_PIN) != HIGH)) 
+      {
+      tone(BUZZER_PIN,notes[i], duration);
+      //delay for 400 miliseconds at increment 9
+      if (i==9){
+        delay(duration*2);
+      } 
+      else{
+        delay(duration);
+      }
+      }
+    } 
 
 }
 
 /**************************************************************************/
+
+
+
 
 
 
